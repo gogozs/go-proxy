@@ -1,0 +1,11 @@
+server:
+  port: 80
+
+proxy:
+  - name: proxy1
+    location: /wx
+    proxy_pass: http://localhost:8008/wx
+    #    rule:     #   = | ~ | ~* | ^~   参考nginx
+  - name: proxy2
+    location: /api
+    proxy_pass: http://localhost:8008/api
