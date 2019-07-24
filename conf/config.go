@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Server ServerConfig
 	Proxy  []ProxyConfig
+	Static []StaticConfig
 }
 
 type ServerConfig struct {
@@ -21,6 +22,12 @@ type ProxyConfig struct {
 	Location  string `mapstructure:"location"`
 	ProxyPass string `mapstructure:"proxy_pass"`
 }
+
+type StaticConfig struct {
+	Path string `mapstructure:"path"`
+	Alias string `mapstructure:"alias"`
+}
+
 
 var config Config
 

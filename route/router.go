@@ -1,28 +1,55 @@
 package route
 
 import (
+	"bytes"
 	"fmt"
 	"go-proxy/conf"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
+	"strings"
+	"time"
 )
 
 type router struct {
 	rules []conf.ProxyConfig
+	staticPaths []conf.StaticConfig
 }
 
 var r = &router{}
 
 func init() {
 	r.rules = conf.GetConfig().Proxy
+	r.staticPaths = conf.GetConfig().Static
 	fmt.Println(r.rules[0])
 }
 
 func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
+
+	//if path == "/" {
+	//	//r.URL.Path = "index.html"
+	//	this.ServeStatic(w, r, ".") // 根目录指向前端静态文件
+	//	return
+	//}
+	fmt.Println(path)
+	if path == "/" {
+		//r.URL.Path = "index.html"
+		this.ServeStatic(w, r, "./html") // 根目录指向前端静态文件
+		return
+	}
+
+	for _, staticConf := range this.staticPaths {
+		if strings.HasPrefix(path, staticConf.Path) {
+			r.URL.Path = strings.TrimLeft(path, staticConf.Path)
+			this.ServeStatic(w, r, staticConf.Alias)
+			return
+		}
+	}
+
 	for _, proxy := range this.rules {
 		re, _ := regexp.Compile(proxy.Location)
 		if re.MatchString(path) {
@@ -37,8 +64,19 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	// TODO 跳转404  根目录指向前端静态文件
+}
 
+// 代理静态文件
+func (this *router) ServeStatic(w http.ResponseWriter, r *http.Request, path string) {
+	hander := http.FileServer(http.Dir(path))
+	hander.ServeHTTP(w, r)
+}
+
+// 提供静态文件下载
+func (this *router) ServeDownload(w http.ResponseWriter, r *http.Request, filePath, fileName string) {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil { fmt.Fprint(w, err) }
+	http.ServeContent(w, r, fileName, time.Now(),   bytes.NewReader(data))
 }
 
 func GetRouter() *router {

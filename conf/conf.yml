@@ -9,3 +9,7 @@ proxy:
   - name: proxy2
     location: /api
     proxy_pass: http://localhost:8008/api
+
+static:
+  - path: /files
+    alias: /Users/zs/test/
