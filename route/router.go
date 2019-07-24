@@ -57,6 +57,8 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+
+	http.ServeFile(w, r, "./html/404.html")
 }
 
 // 代理静态文件
