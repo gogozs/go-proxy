@@ -30,14 +30,7 @@ func init() {
 func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	//if path == "/" {
-	//	//r.URL.Path = "index.html"
-	//	this.ServeStatic(w, r, ".") // 根目录指向前端静态文件
-	//	return
-	//}
-	fmt.Println(path)
 	if path == "/" {
-		//r.URL.Path = "index.html"
 		this.ServeStatic(w, r, "./html") // 根目录指向前端静态文件
 		return
 	}
