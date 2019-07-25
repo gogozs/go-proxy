@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"go-proxy/conf"
+	"go-proxy/log"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -29,7 +29,7 @@ func init() {
 
 func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
-
+	log.Info(fmt.Sprintf("request: %s", path))
 	if path == "/" {
 		this.ServeStatic(w, r, "./html") // 根目录指向前端静态文件
 		return
@@ -49,7 +49,7 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			r.URL.Path = re.ReplaceAllString(path, "/") // 代理
 			remote, err := url.Parse(proxy.ProxyPass)
 			if err != nil {
-				log.Println(err)
+				log.Error(err)
 				panic(err)
 			}
 			proxy := httputil.NewSingleHostReverseProxy(remote)
@@ -57,7 +57,7 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
+	log.Info("response: 404")
 	http.ServeFile(w, r, "./html/404.html")
 }
 
