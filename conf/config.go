@@ -9,12 +9,12 @@ import (
 
 type Config struct {
 	Server ServerConfig
-	Proxy  []ProxyConfig
-	Static []StaticConfig
 }
 
 type ServerConfig struct {
 	Port string
+	Proxy  []ProxyConfig
+	Static []StaticConfig
 }
 
 type ProxyConfig struct {

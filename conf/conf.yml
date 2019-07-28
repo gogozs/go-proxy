@@ -1,15 +1,25 @@
+upstream:
+  localtest:
+    server1:
+      weight: 1
+      host: localhost:8007
+    server2:
+      weight: 3
+      host: localhost:8008
+
+
+
 server:
   port: 80
+  proxy:
+    - name: proxy1
+      location: /wx
+      proxy_pass: http://localtest/wx
+      #    rule:     #   = | ~ | ~* | ^~   参考nginx
+    - name: proxy2
+      location: /api
+      proxy_pass: http://localtest/api
 
-proxy:
-  - name: proxy1
-    location: /wx
-    proxy_pass: http://localhost:8008/wx
-    #    rule:     #   = | ~ | ~* | ^~   参考nginx
-  - name: proxy2
-    location: /api
-    proxy_pass: http://localhost:8008/api
-
-static:
-  - path: /files
-    alias: /Users/zs/test/
+  static:
+    - path: /files
+      alias: /Users/zs/test/

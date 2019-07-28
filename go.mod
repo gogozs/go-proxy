@@ -9,5 +9,6 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/viper v1.4.0
+	github.com/stretchr/testify v1.3.1-0.20190712000136-221dbe5ed467
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 )

@@ -22,8 +22,8 @@ type router struct {
 var r = &router{}
 
 func init() {
-	r.rules = conf.GetConfig().Proxy
-	r.staticPaths = conf.GetConfig().Static
+	r.rules = conf.GetConfig().Server.Proxy
+	r.staticPaths = conf.GetConfig().Server.Static
 	fmt.Println(r.rules[0])
 }
 
