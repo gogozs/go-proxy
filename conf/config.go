@@ -5,14 +5,18 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"path"
+	"strings"
 )
 
 type Config struct {
+	Var VarConfig
 	Server ServerConfig
 }
 
+type VarConfig map[string]string
+
 type ServerConfig struct {
-	Port string
+	Port   string
 	Proxy  []ProxyConfig
 	Static []StaticConfig
 }
@@ -24,12 +28,12 @@ type ProxyConfig struct {
 }
 
 type StaticConfig struct {
-	Path string `mapstructure:"path"`
+	Path  string `mapstructure:"path"`
 	Alias string `mapstructure:"alias"`
 }
 
-
 var config Config
+var ginEnv = "proxy"
 
 func GetConfig() *Config {
 	return &config
@@ -41,10 +45,24 @@ func GetConfigPath() string {
 	return confPath
 }
 
+// 参数解析
+func updateConfig(c *Config) {
+	vars := c.Var
+	proxyList := &(c.Server.Proxy)
+	for i := range *proxyList {
+		p := &(*proxyList)[i]
+		for k, v := range vars {
+			k := "$" + k
+			if strings.Contains(p.ProxyPass, k) {
+				p.ProxyPass = strings.Replace(p.ProxyPass, k, v, 1)
+			}
+		}
+	}
+}
+
 func init() {
 	// 需要配置项目根目录的环境变量，方便执行test
 	confPath := GetConfigPath()
-	ginEnv := "conf"
 	viper.SetConfigName(ginEnv)   // 设置配置文件名 (不带后缀)
 	viper.AddConfigPath(confPath) // 第一个搜索路径
 	viper.WatchConfig()           // 监控配置文件热重载
@@ -53,8 +71,9 @@ func init() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 	err = viper.Unmarshal(&config) // 将配置信息绑定到结构体上
+	updateConfig(&config)
+	fmt.Println(config)
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 }

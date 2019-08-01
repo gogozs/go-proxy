@@ -1,0 +1,41 @@
+var:
+  host: localhost
+server:
+  port: 80
+  proxy:
+    - name: account
+      location: /protected/v1/account/
+      proxy_pass: http://$host:30001
+      #    rule:     #   = | ~ | ~* | ^~   参考nginx
+    - name: token
+      location: /token
+      proxy_pass: http://$host:30001
+
+    - name: role
+      location: /protected/v1/role
+      proxy_pass: http://$host:30001
+
+    - name: department
+      location: /protected/v1/department
+      proxy_pass: http://$host:30001
+
+    - name: app
+      location: /protected/v1/app/
+      proxy_pass: http://$host:30001
+
+    - name: robot
+      location: /protected/v1/robot/
+      proxy_pass: http://$host:30002
+
+    - name: task
+      location: /protected/v1/task/
+      proxy_pass: http://$host:30003
+
+    - name: statistics
+      location: /protected/v1/statistics/
+      proxy_pass: http://$host:30003
+
+
+  static:
+    - path: /v1/files/
+      alias: /Users/zs/test/
