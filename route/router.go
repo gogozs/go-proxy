@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
+	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -27,17 +29,36 @@ func init() {
 	fmt.Println(r.rules[0])
 }
 
+// 判断静态文件是否存在
+func checkStaticfile(urlPath, basePath string) bool {
+	file := path.Join(basePath, urlPath)
+	return Exists(file)
+}
+
+
+func Exists(path string) bool {
+	_, err := os.Stat(path) //os.Stat获取文件信息
+	if err != nil {
+		if os.IsExist(err) {
+			return true
+		}
+		return false
+	}
+	return true
+}
+
 func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-	log.Info(fmt.Sprintf("request: %s", path))
-	if path == "/" {
-		this.ServeStatic(w, r, "./html") // 根目录指向前端静态文件
+	urlPath := r.URL.Path
+	basePath := "./html"
+	log.Info(fmt.Sprintf("request: %s", urlPath))
+	if urlPath == "/" || checkStaticfile(urlPath, basePath) {
+		this.ServeStatic(w, r, basePath) // 根目录指向前端静态文件
 		return
 	}
 
 	for _, staticConf := range this.staticPaths {
-		if strings.HasPrefix(path, staticConf.Path) {
-			r.URL.Path = strings.TrimLeft(path, staticConf.Path)
+		if strings.HasPrefix(urlPath, staticConf.Path) {
+			r.URL.Path = strings.TrimLeft(urlPath, staticConf.Path)
 			this.ServeStatic(w, r, staticConf.Alias)
 			return
 		}
@@ -45,8 +66,8 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, proxy := range this.rules {
 		re, _ := regexp.Compile(proxy.Location)
-		if re.MatchString(path) {
-			r.URL.Path = re.ReplaceAllString(path, "/") // 代理
+		if re.MatchString(urlPath) {
+			r.URL.Path = re.ReplaceAllString(urlPath, "/") // 代理
 			remote, err := url.Parse(proxy.ProxyPass)
 			if err != nil {
 				log.Error(err)
