@@ -67,7 +67,6 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, proxy := range this.rules {
 		re, _ := regexp.Compile(proxy.Location)
 		if re.MatchString(urlPath) {
-			r.URL.Path = re.ReplaceAllString(urlPath, "/") // 代理
 			remote, err := url.Parse(proxy.ProxyPass)
 			if err != nil {
 				log.Error(err)
