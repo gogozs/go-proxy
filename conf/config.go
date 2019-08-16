@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Var VarConfig
 	Server ServerConfig
+	Common CommonConfig
 }
 
 type VarConfig map[string]string
@@ -32,6 +33,11 @@ type StaticConfig struct {
 	Alias string `mapstructure:"alias"`
 }
 
+type CommonConfig struct {
+	LogFile string
+	Level string
+}
+
 var config Config
 var ginEnv = "proxy"
 
@@ -40,7 +46,7 @@ func GetConfig() *Config {
 }
 
 func GetConfigPath() string {
-	wd := os.Getenv("AGENT_WORKDIR")
+	wd := os.Getenv("PROXY_WORKDIR")
 	confPath := path.Join(wd, "conf/")
 	return confPath
 }

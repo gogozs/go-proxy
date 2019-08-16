@@ -6,7 +6,7 @@ server:
     - name: account
       location: /protected/v1/account/
       proxy_pass: http://$host:30001
-      #    rule:     #   = | ~ | ~* | ^~   参考nginx
+
     - name: token
       location: /token
       proxy_pass: http://$host:30001
@@ -39,3 +39,7 @@ server:
   static:
     - path: /v1/files/
       alias: /Users/zs/test/
+
+common:
+  logfile: go-proxy.log # 日志文件
+  level: info   # 日志级别
