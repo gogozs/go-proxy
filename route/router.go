@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-proxy/conf"
 	"go-proxy/log"
+	"go-proxy/utils/lru"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
@@ -17,11 +18,14 @@ import (
 )
 
 type router struct {
-	rules []conf.ProxyConfig
+	rules       []conf.ProxyConfig
 	staticPaths []conf.StaticConfig
 }
 
-var r = &router{}
+var (
+	r     = &router{}
+	cachePath = lru.NewList()
+)
 
 func init() {
 	r.rules = conf.GetConfig().Server.Proxy
@@ -34,7 +38,6 @@ func checkStaticfile(urlPath, basePath string) bool {
 	file := path.Join(basePath, urlPath)
 	return Exists(file)
 }
-
 
 func Exists(path string) bool {
 	_, err := os.Stat(path) //os.Stat获取文件信息
@@ -64,21 +67,33 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	for _, proxy := range this.rules {
-		re, _ := regexp.Compile(proxy.Location)
-		if re.MatchString(urlPath) {
-			remote, err := url.Parse(proxy.ProxyPass)
-			if err != nil {
-				log.Error(err)
-				panic(err)
+	if proxyPass, ok := cachePath.GetCache(urlPath);ok {
+		this.ServeProxy(w, r, proxyPass)
+		return
+	} else {
+		for _, proxy := range this.rules {
+			re, _ := regexp.Compile(proxy.Location)
+			if re.MatchString(urlPath) {
+				proxyPass := proxy.ProxyPass
+				this.ServeProxy(w, r, proxyPass)
+				cachePath.AddCache(urlPath,proxyPass)
+				return
 			}
-			proxy := httputil.NewSingleHostReverseProxy(remote)
-			proxy.ServeHTTP(w, r)
-			break
 		}
 	}
+
 	log.Info("response: 404")
 	http.ServeFile(w, r, "./html/404.html")
+}
+
+func (this *router) ServeProxy(w http.ResponseWriter, r *http.Request, proxyPass string) {
+	remote, err := url.Parse(proxyPass)
+	if err != nil {
+		log.Error(err)
+		panic(err)
+	}
+	proxy := httputil.NewSingleHostReverseProxy(remote)
+	proxy.ServeHTTP(w, r)
 }
 
 // 代理静态文件
@@ -90,8 +105,10 @@ func (this *router) ServeStatic(w http.ResponseWriter, r *http.Request, path str
 // 提供静态文件下载
 func (this *router) ServeDownload(w http.ResponseWriter, r *http.Request, filePath, fileName string) {
 	data, err := ioutil.ReadFile(filePath)
-	if err != nil { fmt.Fprint(w, err) }
-	http.ServeContent(w, r, fileName, time.Now(),   bytes.NewReader(data))
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	http.ServeContent(w, r, fileName, time.Now(), bytes.NewReader(data))
 }
 
 func GetRouter() *router {
