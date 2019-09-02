@@ -68,7 +68,6 @@ func Logrotate() {
 		zap.DebugLevel,
 	)
 	logger = zap.New(core, zap.AddCaller())
-	logger.Info(c.Level)
 }
 
 

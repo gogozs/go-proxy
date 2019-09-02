@@ -1,9 +1,11 @@
 package route
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,6 +13,15 @@ import (
 )
 
 func TestRouter_ServeHTTP(t *testing.T) {
+	r :=  GetRouter()
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/protected/v1/app/view/queryApps", nil)
+	r.ServeHTTP(w, req)
+	res, _ := ioutil.ReadAll(w.Body)
+	fmt.Println(res)
+}
+
+func TestRouter_ServeStatic(t *testing.T) {
 	c := http.Client{}
 	req1, err1 := http.NewRequest("GET", "http://localhost/", nil)
 	req2, err2 := http.NewRequest("GET", "http://localhost/index.html", nil)

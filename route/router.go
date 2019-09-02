@@ -22,15 +22,16 @@ type router struct {
 	staticPaths []conf.StaticConfig
 }
 
+const basePath = "./html"
+
 var (
-	r     = &router{}
+	r         = &router{}
 	cachePath = lru.NewList()
 )
 
 func init() {
 	r.rules = conf.GetConfig().Server.Proxy
 	r.staticPaths = conf.GetConfig().Server.Static
-	fmt.Println(r.rules[0])
 }
 
 // 判断静态文件是否存在
@@ -52,7 +53,6 @@ func Exists(path string) bool {
 
 func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	urlPath := r.URL.Path
-	basePath := "./html"
 	log.Info(fmt.Sprintf("request: %s", urlPath))
 	if urlPath == "/" || checkStaticfile(urlPath, basePath) {
 		this.ServeStatic(w, r, basePath) // 根目录指向前端静态文件
@@ -67,7 +67,7 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if proxyPass, ok := cachePath.GetCache(urlPath);ok {
+	if proxyPass, ok := cachePath.GetCache(urlPath); ok {
 		this.ServeProxy(w, r, proxyPass)
 		return
 	} else {
@@ -75,15 +75,13 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			re, _ := regexp.Compile(proxy.Location)
 			if re.MatchString(urlPath) {
 				proxyPass := proxy.ProxyPass
+				log.Info(fmt.Sprintf("%s: %s", urlPath,  proxy.ProxyPass))
 				this.ServeProxy(w, r, proxyPass)
 				cachePath.AddCache(urlPath,proxyPass)
 				return
 			}
 		}
 	}
-
-	log.Info("response: 404")
-	http.ServeFile(w, r, "./html/404.html")
 }
 
 func (this *router) ServeProxy(w http.ResponseWriter, r *http.Request, proxyPass string) {

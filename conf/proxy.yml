@@ -5,41 +5,34 @@ server:
   proxy:
     - name: account
       location: /protected/v1/account/
-      proxy_pass: http://$host:30001
+      proxy_pass: http://$host:20001
 
     - name: token
       location: /token
-      proxy_pass: http://$host:30001
+      proxy_pass: http://$host:20001
 
-    - name: role
-      location: /protected/v1/role
-      proxy_pass: http://$host:30001
-
-    - name: department
-      location: /protected/v1/department
-      proxy_pass: http://$host:30001
-
-    - name: app
-      location: /protected/v1/app/
-      proxy_pass: http://$host:30001
+    - name: front
+      location: /protected/v1/(app|department|role|account|devices|client|asset|front)
+      proxy_pass: http://$host:20001
 
     - name: robot
-      location: /protected/v1/robot/
-      proxy_pass: http://$host:30002
+      location: (/protected/v1/robot/)|(/v1/robot/)
+      proxy_pass: http://$host:20002
+
 
     - name: task
-      location: /protected/v1/task/
-      proxy_pass: http://$host:30003
+      location: (/protected/v1/task/)|(/v1/task/)
+      proxy_pass: http://$host:20003
 
     - name: statistics
       location: /protected/v1/statistics/
-      proxy_pass: http://$host:30003
+      proxy_pass: http://$host:20003
 
+    - name: management
+      location: /v1/client/management/
+      proxy_pass: http://$host:20001
 
+  #！ 需要修改
   static:
     - path: /v1/files/
-      alias: /Users/zs/test/
-
-common:
-  logfile: go-proxy.log # 日志文件
-  level: info   # 日志级别
+      alias: D:/files  # 必须与 conf/conf.yml 中 env RPA_APP_FILE_PATH 一致
