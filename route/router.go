@@ -68,7 +68,7 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if proxyPass, ok := cachePath.GetCache(urlPath); ok {
-		this.ServeProxy(w, r, proxyPass)
+		this.ServeProxy(w, r, proxyPass.(string))
 		return
 	} else {
 		for _, proxy := range this.rules {
@@ -77,7 +77,7 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				proxyPass := proxy.ProxyPass
 				log.Info(fmt.Sprintf("%s: %s", urlPath,  proxy.ProxyPass))
 				this.ServeProxy(w, r, proxyPass)
-				cachePath.AddCache(urlPath,proxyPass)
+				cachePath.SetCache(urlPath,proxyPass)
 				return
 			}
 		}

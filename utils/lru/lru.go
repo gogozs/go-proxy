@@ -4,29 +4,32 @@
 
 package lru
 
-import "container/list"
+import (
+	"container/list"
+	"sync"
+)
 
 type Cache struct {
 	key   string
-	value string
+	value interface{}
 }
 
 type CacheList struct {
 	l         *list.List
-	m         map[string]string
+	m         sync.Map
 	maxLength int
 }
 
 func NewList(num ...int) *CacheList {
-	maxLength := 10
+	maxLength := 1000
 	if len(num) > 0 && num[0] > 0 {
 		maxLength = num[0]
 	}
-	return &CacheList{list.New(), make(map[string]string), maxLength}
+	return &CacheList{list.New(), sync.Map{}, maxLength}
 }
 
-func (cl *CacheList) GetCache(key string) (string, bool) {
-	if value, ok := cl.m[key]; ok {
+func (cl *CacheList) GetCache(key string) (interface{}, bool) {
+	if value, ok := cl.m.Load(key); ok {
 		cl.MoveFront(Cache{key:key, value:value})
 		return value, ok
 	} else {
@@ -34,17 +37,17 @@ func (cl *CacheList) GetCache(key string) (string, bool) {
 	}
 }
 
-func (cl *CacheList) AddCache(key, value string) {
+func (cl *CacheList) SetCache(key string, value interface{}) {
 	c := Cache{key: key, value: value}
-	if _, ok := cl.m[c.key]; !ok {
-		cl.m[c.key] = c.value
+	if _, ok := cl.m.Load(c.key); !ok {
+		cl.m.Store(c.key, c.value)
 		cl.l.PushFront(c.key)
 		if cl.l.Len() > cl.maxLength {
-			delete(cl.m, cl.l.Back().Value.(string))
+			cl.m.Delete(cl.l.Back().Value.(string))
 			cl.l.Remove(cl.l.Back())
 		}
 	} else {
-		cl.m[c.key] = c.value
+		cl.m.Store(c.key, c.value)
 		cl.MoveFront(c)
 	}
 }
@@ -58,7 +61,7 @@ func (cl *CacheList) MoveFront(c Cache) {
 }
 
 func (cl *CacheList) RemoveCache(key string) {
-	delete(cl.m, key)
+	cl.m.Delete(key)
 	for e := cl.l.Front(); e != nil; e = e.Next() {
 		if e.Value == key {
 			cl.l.Remove(e)
