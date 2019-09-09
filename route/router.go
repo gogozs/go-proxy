@@ -3,9 +3,9 @@ package route
 import (
 	"bytes"
 	"fmt"
+	"github.com/go-zs/cache"
 	"go-proxy/conf"
 	"go-proxy/log"
-	"go-proxy/utils/lru"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
@@ -26,7 +26,7 @@ const basePath = "./html"
 
 var (
 	r         = &router{}
-	cachePath = lru.NewList()
+	cachePath = cache.NewStore()
 )
 
 func init() {
@@ -75,9 +75,9 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			re, _ := regexp.Compile(proxy.Location)
 			if re.MatchString(urlPath) {
 				proxyPass := proxy.ProxyPass
-				log.Info(fmt.Sprintf("%s: %s", urlPath,  proxy.ProxyPass))
+				log.Info(fmt.Sprintf("%s: %s", urlPath, proxy.ProxyPass))
 				this.ServeProxy(w, r, proxyPass)
-				cachePath.SetCache(urlPath,proxyPass)
+				cachePath.SetCache(urlPath, proxyPass)
 				return
 			}
 		}

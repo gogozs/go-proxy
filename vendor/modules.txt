@@ -2,6 +2,8 @@
 github.com/davecgh/go-spew/spew
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
+# github.com/go-zs/cache v0.0.0-20190908234521-122912317055
+github.com/go-zs/cache
 # github.com/hashicorp/hcl v1.0.0
 github.com/hashicorp/hcl
 github.com/hashicorp/hcl/hcl/printer
@@ -32,7 +34,7 @@ github.com/spf13/jwalterweatherman
 github.com/spf13/pflag
 # github.com/spf13/viper v1.4.0
 github.com/spf13/viper
-# github.com/stretchr/testify v1.3.1-0.20190712000136-221dbe5ed467
+# github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
 # go.uber.org/atomic v1.4.0
 go.uber.org/atomic
