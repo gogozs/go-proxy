@@ -32,6 +32,10 @@ server:
       location: /v1/client/management/
       proxy_pass: http://$host:20001
 
+    - name: other
+      location: /v1/.*
+      proxy_pass: http://$host:20001
+
   #！ 需要修改
   static:
     - path: /v1/files/

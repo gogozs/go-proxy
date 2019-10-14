@@ -82,6 +82,8 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, "404 not found")
 }
 
 func (this *router) ServeProxy(w http.ResponseWriter, r *http.Request, proxyPass string) {

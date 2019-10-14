@@ -6,6 +6,7 @@ import (
 	"go-proxy/route"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 )
 
 func startServer() {
@@ -19,5 +20,6 @@ func startServer() {
 }
 
 func main() {
+	go http.ListenAndServe(":8888", nil)
 	startServer()
 }
