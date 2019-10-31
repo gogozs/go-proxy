@@ -1,5 +1,6 @@
 var:
   host: localhost
+  RPA_APP_FILE_PATH: $RPA_APP_FILE_PATH
 server:
   port: 80
   proxy:
@@ -39,4 +40,4 @@ server:
   #！ 需要修改
   static:
     - path: /v1/files/
-      alias: D:/files  # 必须与 conf/conf.yml 中 env RPA_APP_FILE_PATH 一致
+      alias: $RPA_APP_FILE_PATH  # 必须与 conf/conf.yml 中 env RPA_APP_FILE_PATH 一致

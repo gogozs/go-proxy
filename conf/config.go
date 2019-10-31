@@ -66,6 +66,20 @@ func updateConfig(c *Config) {
 	}
 }
 
+// 解析环境变量
+func initVars(c *Config) {
+	for k, v := range c.Var {
+		// 环境变量
+		if strings.HasPrefix(v, "$") {
+			envVal := string([]byte(v)[1:])
+			v = os.Getenv(envVal)
+		} else if strings.HasPrefix(v, `\$`) {
+			v = string([]byte(v)[1:])
+		}
+		c.Var[k] = v
+	}
+}
+
 func init() {
 	// 需要配置项目根目录的环境变量，方便执行test
 	confPath := GetConfigPath()
@@ -77,6 +91,7 @@ func init() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 	err = viper.Unmarshal(&config) // 将配置信息绑定到结构体上
+	initVars(&config)
 	updateConfig(&config)
 	fmt.Println(config)
 	if err != nil {
