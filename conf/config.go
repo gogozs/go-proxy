@@ -34,20 +34,36 @@ type StaticConfig struct {
 }
 
 type CommonConfig struct {
+	Tls bool
 	LogFile string
 	Level string
 }
 
 var config Config
-var ginEnv = "proxy"
+var confEnv = "proxy"
 
 func GetConfig() *Config {
 	return &config
 }
 
+// get home dir of app, use PROXY_WORKDIR env var if present, else executable dir.
+func exeDir() string {
+	dir, exists := os.LookupEnv("PROXY_WORKDIR")
+	if exists {
+		return dir
+	} else {
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		exPath := path.Dir(ex)
+		return exPath
+	}
+}
+
 func GetConfigPath() string {
-	wd := os.Getenv("PROXY_WORKDIR")
-	confPath := path.Join(wd, "conf/")
+	baseDir := exeDir()
+	confPath := path.Join(baseDir, "conf/")
 	return confPath
 }
 
@@ -83,7 +99,7 @@ func initVars(c *Config) {
 func init() {
 	// 需要配置项目根目录的环境变量，方便执行test
 	confPath := GetConfigPath()
-	viper.SetConfigName(ginEnv)   // 设置配置文件名 (不带后缀)
+	viper.SetConfigName(confEnv)   // 设置配置文件名 (不带后缀)
 	viper.AddConfigPath(confPath) // 第一个搜索路径
 	viper.WatchConfig()           // 监控配置文件热重载
 	err := viper.ReadInConfig()   // 读取配置数据

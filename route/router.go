@@ -61,7 +61,7 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, staticConf := range this.staticPaths {
 		if strings.HasPrefix(urlPath, staticConf.Path) {
-			r.URL.Path = strings.TrimLeft(urlPath, staticConf.Path)
+			r.URL.Path = strings.TrimPrefix(urlPath, staticConf.Path)
 			this.ServeStatic(w, r, staticConf.Alias)
 			return
 		}
