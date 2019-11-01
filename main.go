@@ -18,7 +18,7 @@ func startServer() {
 		confPath := conf.GetConfigPath()
 		crtPath := path.Join(confPath, "server.crt")
 		keyPath := path.Join(confPath, "server.key")
-		if e := http.ListenAndServeTLS(fmt.Sprintf(":%s", c.Server.Port), crtPath, keyPath, nil); e != nil {
+		if e := http.ListenAndServeTLS(fmt.Sprintf(":%s", c.Server.Port), crtPath, keyPath, r); e != nil {
 			log.Fatal("ListenAndServe: ", e)
 		}
 	} else {

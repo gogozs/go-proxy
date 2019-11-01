@@ -74,6 +74,8 @@ func updateConfig(c *Config) {
 	for i := range *proxyList {
 		p := &(*proxyList)[i]
 		for k, v := range vars {
+			fmt.Println("k=", k)
+			fmt.Println("v=", v)
 			k := "$" + k
 			if strings.Contains(p.ProxyPass, k) {
 				p.ProxyPass = strings.Replace(p.ProxyPass, k, v, 1)
