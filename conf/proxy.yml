@@ -39,7 +39,8 @@ server:
   #！ 需要修改
   static:
     - path: /v1/files/
-      alias: D:/files  # 必须与 conf/conf.yml 中 env RPA_APP_FILE_PATH 一致
+      alias: /tmp  # 必须与 conf/conf.yml 中 env RPA_APP_FILE_PATH 一致
 
 common:
-  Tls: true
+  Tls: false
+  LogFile: proxy.log

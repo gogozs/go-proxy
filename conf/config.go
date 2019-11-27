@@ -37,6 +37,8 @@ type CommonConfig struct {
 	Tls bool
 	LogFile string
 	Level string
+	ReadTimeOut int
+	WriteTimeOut int
 }
 
 var config Config
