@@ -98,8 +98,8 @@ func (this *router) ServeProxy(w http.ResponseWriter, r *http.Request, proxyPass
 
 // 代理静态文件
 func (this *router) ServeStatic(w http.ResponseWriter, r *http.Request, path string) {
-	hander := http.FileServer(http.Dir(path))
-	hander.ServeHTTP(w, r)
+	handler := http.FileServer(http.Dir(path))
+	handler.ServeHTTP(w, r)
 }
 
 // 提供静态文件下载

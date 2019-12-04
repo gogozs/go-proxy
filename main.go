@@ -46,6 +46,6 @@ func startServer() {
 }
 
 func main() {
-	go http.ListenAndServe(":8080", nil) // debug
+	//go http.ListenAndServe(":8080", nil) // debug
 	startServer()
 }
