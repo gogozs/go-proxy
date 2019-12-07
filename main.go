@@ -11,6 +11,13 @@ import (
 	"time"
 )
 
+func init() {
+	if conf.GetConfig().Common.Debug {
+		go http.ListenAndServe(":8080", nil) // pprof debug
+	}
+}
+
+
 func startServer() {
 	c := conf.GetConfig()
 	r := route.GetRouter()
@@ -46,6 +53,5 @@ func startServer() {
 }
 
 func main() {
-	go http.ListenAndServe(":8080", nil) // debug
 	startServer()
 }

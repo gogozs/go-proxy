@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	Var VarConfig
+	Var    VarConfig
 	Server ServerConfig
 	Common CommonConfig
 }
@@ -37,9 +37,10 @@ type CommonConfig struct {
 	Tls          bool
 	LogFile      string
 	Level        string
-	ReadTimeout  int // 超时时间
-	WriteTimeout int // 超时时间
-	Timeout      int // 超时时间
+	ReadTimeout  int  // 超时时间
+	WriteTimeout int  // 超时时间
+	Timeout      int  // 超时时间
+	Debug        bool // 调试选项
 }
 
 var config Config
@@ -104,7 +105,7 @@ func initVars(c *Config) {
 func init() {
 	// 需要配置项目根目录的环境变量，方便执行test
 	confPath := GetConfigPath()
-	viper.SetConfigName(confEnv)   // 设置配置文件名 (不带后缀)
+	viper.SetConfigName(confEnv)  // 设置配置文件名 (不带后缀)
 	viper.AddConfigPath(confPath) // 第一个搜索路径
 	viper.WatchConfig()           // 监控配置文件热重载
 	err := viper.ReadInConfig()   // 读取配置数据
