@@ -98,7 +98,7 @@ func (this *router) ServeProxy(w http.ResponseWriter, r *http.Request, proxyPass
 	// 设置超时时间
 	t := conf.GetConfig().Common.Timeout
 	if t < 5 {
-		t = 15
+		t = 15 // 默认15秒超时
 	}
 	ctx, _ := context.WithTimeout(context.Background(), time.Second * time.Duration(t))
 	r = r.WithContext(ctx)

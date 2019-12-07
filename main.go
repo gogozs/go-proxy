@@ -6,7 +6,7 @@ import (
 	"go-proxy/route"
 	"log"
 	"net/http"
-	_ "net/http/pprof"  // pprof debug
+	_ "net/http/pprof" // pprof debug
 	"path"
 	"time"
 )
@@ -17,14 +17,14 @@ func startServer() {
 	readTimeOut := c.Common.ReadTimeout
 	writeTimeOut := c.Common.WriteTimeout
 	if readTimeOut <= 0 {
-		readTimeOut = 3
-	}
-	if writeTimeOut <= 0 {
 		readTimeOut = 5
 	}
+	if writeTimeOut <= 0 {
+		writeTimeOut = 10
+	}
 	server := http.Server{
-		ReadTimeout: 10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout: time.Duration(readTimeOut) * time.Second,
+		WriteTimeout: time.Duration(writeTimeOut) * time.Second,
 		Handler: r,
 		Addr: fmt.Sprintf(":%s", c.Server.Port),
 	}
