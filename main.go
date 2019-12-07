@@ -14,17 +14,17 @@ import (
 func startServer() {
 	c := conf.GetConfig()
 	r := route.GetRouter()
-	readTimeOut := c.Common.ReadTimeOut
-	writeTimeOut := c.Common.WriteTimeOut
+	readTimeOut := c.Common.ReadTimeout
+	writeTimeOut := c.Common.WriteTimeout
 	if readTimeOut <= 0 {
-		readTimeOut = 5
+		readTimeOut = 3
 	}
 	if writeTimeOut <= 0 {
-		readTimeOut = 10
+		readTimeOut = 5
 	}
 	server := http.Server{
-		ReadTimeout: time.Duration(readTimeOut) * time.Second,
-		WriteTimeout: time.Duration(writeTimeOut) * time.Second,
+		ReadTimeout: 10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 		Handler: r,
 		Addr: fmt.Sprintf(":%s", c.Server.Port),
 	}
@@ -46,6 +46,6 @@ func startServer() {
 }
 
 func main() {
-	//go http.ListenAndServe(":8080", nil) // debug
+	go http.ListenAndServe(":8080", nil) // debug
 	startServer()
 }

@@ -34,11 +34,12 @@ type StaticConfig struct {
 }
 
 type CommonConfig struct {
-	Tls bool
-	LogFile string
-	Level string
-	ReadTimeOut int
-	WriteTimeOut int
+	Tls          bool
+	LogFile      string
+	Level        string
+	ReadTimeout  int // 超时时间
+	WriteTimeout int // 超时时间
+	Timeout      int // 超时时间
 }
 
 var config Config

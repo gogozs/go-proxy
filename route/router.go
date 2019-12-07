@@ -2,11 +2,13 @@ package route
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/go-zs/cache"
 	"go-proxy/conf"
 	"go-proxy/log"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -93,8 +95,35 @@ func (this *router) ServeProxy(w http.ResponseWriter, r *http.Request, proxyPass
 		panic(err)
 	}
 	proxy := httputil.NewSingleHostReverseProxy(remote)
+	// 设置超时时间
+	t := conf.GetConfig().Common.Timeout
+	if t < 5 {
+		t = 15
+	}
+	ctx, _ := context.WithTimeout(context.Background(), time.Second * time.Duration(t))
+	r = r.WithContext(ctx)
 	proxy.ServeHTTP(w, r)
 }
+
+func newCustomerHostReverseProxy(target *url.URL) *httputil.ReverseProxy {
+	director := func(req *http.Request) {
+		req.URL.Scheme = target.Scheme
+		req.URL.Host = target.Host
+
+		if _, ok := req.Header["User-Agent"]; !ok {
+			req.Header.Set("User-Agent", "")
+		}
+	}
+
+	return &httputil.ReverseProxy{
+		Director: director,
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				return net.DialTimeout(network, addr, time.Second*30)},
+		},
+	}
+}
+
 
 // 代理静态文件
 func (this *router) ServeStatic(w http.ResponseWriter, r *http.Request, path string) {

@@ -44,3 +44,6 @@ server:
 common:
   Tls: false
   LogFile: proxy.log
+  ReadTimeout: 5
+  WriteTimeout: 10
+  Timeout: 15
