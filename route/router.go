@@ -94,15 +94,15 @@ func (this *router) ServeProxy(w http.ResponseWriter, r *http.Request, proxyPass
 		log.Error(err)
 		panic(err)
 	}
-	proxy := httputil.NewSingleHostReverseProxy(remote)
+	proxy := newCustomerHostReverseProxy(remote)
 	// 设置超时时间
 	t := conf.GetConfig().Common.Timeout
 	if t < 5 {
 		t = 15 // 默认15秒超时
 	}
 	ctx, _ := context.WithTimeout(context.Background(), time.Second * time.Duration(t))
-	r = r.WithContext(ctx)
-	proxy.ServeHTTP(w, r)
+	r2 := r.WithContext(ctx)
+	proxy.ServeHTTP(w, r2)
 }
 
 func newCustomerHostReverseProxy(target *url.URL) *httputil.ReverseProxy {
@@ -119,7 +119,7 @@ func newCustomerHostReverseProxy(target *url.URL) *httputil.ReverseProxy {
 		Director: director,
 		Transport: &http.Transport{
 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-				return net.DialTimeout(network, addr, time.Second*30)},
+				return net.DialTimeout(network, addr, time.Second*15)},
 		},
 	}
 }

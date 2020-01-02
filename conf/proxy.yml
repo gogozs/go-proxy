@@ -47,4 +47,4 @@ common:
   ReadTimeout: 10
   WriteTimeout: 15
   Timeout: 15
-  Debug: false
+  Debug: true
